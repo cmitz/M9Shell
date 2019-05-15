@@ -14,6 +14,7 @@ void SimpleCommand::execute() {
 
     if (command == "cd") {
         cd();
+        std::cout << pwd() << std::endl;
         return;
     }
 }
@@ -54,8 +55,5 @@ void SimpleCommand::cd() {
 
         // Change dir to path
         chdir(path);
-
-        // Print result
-        std::cout << pwd() << std::endl;
     }
 };
