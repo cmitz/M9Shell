@@ -21,7 +21,7 @@ class SimpleCommand {
 		std::vector<std::string> arguments;
 		std::vector<IORedirect>  redirects;
 
-		void pwd();
+		std::string pwd();
 		void cd();
 
 	public:
