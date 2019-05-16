@@ -7,6 +7,10 @@
 //    std::vector<IORedirect>  redirects;
 
 void SimpleCommand::execute() {
+    if (command == "exit") {
+        exit(0);
+    }
+
     if (command == "pwd") {
         std::cout << pwd() << std::endl;
         return;
@@ -17,6 +21,26 @@ void SimpleCommand::execute() {
         std::cout << pwd() << std::endl;
         return;
     }
+
+    // Command was not a built-in command
+    // TODO: check if command is a path to a local executable
+
+    pid_t cpid;
+    cpid = fork();
+    int returnValue;
+
+    switch (cpid) {
+        case -1: std::cerr << "Error forking" << std::endl;
+            break;
+        // This is the child process
+        case 0:
+            execl(command.c_str(), nullptr); // command.c_str()
+            _exit (EXIT_FAILURE);
+        // This is the parent process
+        default: waitpid(cpid, &returnValue, 0);
+    }
+
+    std::cout << "Program " << command << " exited with " << returnValue << std::endl;
 }
 
 /**
