@@ -47,7 +47,7 @@ void SimpleCommand::cd() {
     } else {
         // Get current path
         char path[256];
-        getcwd(path, sizeof(path));
+        strcpy(path, pwd().c_str());
 
         // Add trailing slash
         strcat(path, "/");
