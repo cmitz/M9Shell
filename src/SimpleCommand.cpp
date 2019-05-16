@@ -8,7 +8,7 @@
 
 void SimpleCommand::execute() {
     if (command == "exit") {
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     if (command == "pwd") {
@@ -22,22 +22,29 @@ void SimpleCommand::execute() {
         return;
     }
 
-    // Command was not a built-in command
-    // TODO: check if command is a path to a local executable
+    // Command was not a built-in command, must be a program
+    // Convert arguments
+    std::vector<char *> argsc;
+    argsc.reserve(arguments.size() + 2);
+    argsc.push_back(const_cast<char *>(command.c_str()));
+    for(std::string const arg : arguments)
+        argsc.push_back(const_cast<char *>(arg.c_str()));
+    argsc.push_back(nullptr);
 
-    pid_t cpid;
-    cpid = fork();
-    int returnValue;
+    // Fork this process
+    pid_t cid;
+    cid = fork();
+    int returnValue = 0;
 
-    switch (cpid) {
+    switch (cid) {
         case -1: std::cerr << "Error forking" << std::endl;
             break;
-        // This is the child process
-        case 0:
-            execl(command.c_str(), nullptr); // command.c_str()
-            _exit (EXIT_FAILURE);
-        // This is the parent process
-        default: waitpid(cpid, &returnValue, 0);
+        case 0: // This is the child process
+            execvp(command.c_str(), argsc.data());
+            exit(EXIT_SUCCESS);
+
+            // This is the parent process
+        default: waitpid(cid, &returnValue, 0);
     }
 
     std::cout << "Program " << command << " exited with " << returnValue << std::endl;
