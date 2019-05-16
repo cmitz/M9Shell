@@ -47,7 +47,7 @@ void SimpleCommand::execute() {
         default: waitpid(cid, &returnValue, 0);
     }
 
-    std::cout << "Program " << command << " exited with " << returnValue << std::endl;
+    std::cout << "Program " << command << " exited with status code " << returnValue << "." << std::endl;
 }
 
 /**
