@@ -27,7 +27,7 @@ void SimpleCommand::execute() {
     std::vector<char *> argsc;
     argsc.reserve(arguments.size() + 2);
     argsc.push_back(const_cast<char *>(command.c_str()));
-    for(std::string const arg : arguments)
+    for(std::string const &arg : arguments)
         argsc.push_back(const_cast<char *>(arg.c_str()));
     argsc.push_back(nullptr);
 
@@ -73,7 +73,6 @@ void SimpleCommand::cd() {
         char *home = getenv("HOME");
 
         chdir(home);
-        std::cout << pwd() << std::endl;
         return;
     } else {
         // Get current path
