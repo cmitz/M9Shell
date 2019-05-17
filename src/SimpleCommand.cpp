@@ -89,22 +89,19 @@ void SimpleCommand::program() {
 
             if (!redirects.empty()) {
                 for (IORedirect const &red : redirects) {
-                    int fd;
+
+                    int flags;
                     switch(red.getType()) {
-                        case IORedirect::Type::APPEND:
-                            fd = open(red.getNewFile().c_str(), O_CREAT|O_RDWR|O_APPEND, 0664);
-                            dup2(fd, red.getOldFileDescriptor());
+                        case IORedirect::Type::APPEND: flags = O_CREAT|O_RDWR|O_APPEND;
                             break;
-                        case IORedirect::Type::OUTPUT:
-                            fd = open(red.getNewFile().c_str(), O_CREAT|O_TRUNC|O_WRONLY, 0664);
-                            dup2(fd, red.getOldFileDescriptor());
+                        case IORedirect::Type::OUTPUT: flags = O_CREAT|O_TRUNC|O_WRONLY;
                             break;
                         case IORedirect::Type::INPUT:
-                            fd = open(red.getNewFile().c_str(), O_CREAT|O_RDONLY, 0664);
-                            printf(" INPUT fd: %d; %s", fd, red.getNewFile().c_str());
-                            dup2(fd, red.getOldFileDescriptor());
+                        default: flags = O_CREAT|O_RDONLY;
                             break;
                     }
+                    int fd = open(red.getNewFile().c_str(), flags, 0664);
+                    dup2(fd, red.getOldFileDescriptor());
                 }
             }
 
