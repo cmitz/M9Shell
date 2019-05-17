@@ -1,5 +1,6 @@
 #include <iostream>
 #include <unistd.h>
+#include <fcntl.h>
 #include "SimpleCommand.h"
 
 //    std::string              command;
@@ -22,32 +23,7 @@ void SimpleCommand::execute() {
         return;
     }
 
-    // Command was not a built-in command, must be a program
-    // Convert arguments
-    std::vector<char *> argsc;
-    argsc.reserve(arguments.size() + 2);
-    argsc.push_back(const_cast<char *>(command.c_str()));
-    for(std::string const &arg : arguments)
-        argsc.push_back(const_cast<char *>(arg.c_str()));
-    argsc.push_back(nullptr);
-
-    // Fork this process
-    pid_t cid;
-    cid = fork();
-    int returnValue = 0;
-
-    switch (cid) {
-        case -1: std::cerr << "Error forking" << std::endl;
-            break;
-        case 0: // This is the child process
-            execvp(command.c_str(), argsc.data());
-            exit(EXIT_SUCCESS);
-
-            // This is the parent process
-        default: waitpid(cid, &returnValue, 0);
-    }
-
-    std::cout << "Program " << command << " exited with status code " << returnValue << "." << std::endl;
+    program();
 }
 
 /**
@@ -86,4 +62,51 @@ void SimpleCommand::cd() {
         // Change dir to path
         chdir(path);
     }
-};
+}
+
+/**
+ * Execute whatever command has been given as a program
+ * Exits the spawned child process!
+ */
+void SimpleCommand::program() {
+    // Convert arguments to char* so we can supply that to execvp
+    std::vector<char *> argsc;
+    argsc.reserve(arguments.size() + 2);
+    argsc.push_back(const_cast<char *>(command.c_str()));
+
+    for(std::string const &arg : arguments)
+        argsc.push_back(const_cast<char *>(arg.c_str()));
+    argsc.push_back(nullptr);
+
+    // Fork this process
+    pid_t cid;
+    cid = fork();
+    int returnValue = 0;
+
+    // Execute program
+    switch (cid) {
+        case -1:
+            std::cerr << "Error forking" << std::endl;
+            exit(-1);
+        case 0: // This is the child process
+
+            if (!redirects.empty()) {
+                for (IORedirect const &red : redirects) {
+                    if (red.getType() == IORedirect::Type::APPEND) {
+                        std::string const &out = red.getNewFile();
+                        int fd = open(out.c_str(), O_CREAT|O_APPEND, 0664);
+                        std::cout << "FD: " << fd << std::endl;
+                        dup2(fd, 1); // Replace stdout with fd; close original fd
+                    }
+                }
+            }
+
+            execvp(command.c_str(), argsc.data()); // Replace current process with command process
+            exit(EXIT_SUCCESS);
+
+            // This is the parent process
+        default: waitpid(cid, &returnValue, 0);
+    }
+
+    std::cout << "Program " << command << " exited with status code " << returnValue << "." << std::endl;
+}

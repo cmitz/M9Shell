@@ -23,6 +23,7 @@ class SimpleCommand {
 
 		std::string pwd();
 		void cd();
+        void program();
 
 	public:
 		SimpleCommand( std::string const &cmd )
