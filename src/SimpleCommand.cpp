@@ -91,8 +91,7 @@ void SimpleCommand::program() {
             execvp(command.c_str(), argsc.data()); // Replace current process with command process
             exit(EXIT_SUCCESS);
 
-            // This is the parent process
-        default: waitpid(cid, &returnValue, 0);
+        default: waitpid(cid, &returnValue, 0); // This is the parent process
     }
 
     std::cout << "Program " << command << " exited with status code " << returnValue << "." << std::endl;
@@ -101,7 +100,7 @@ void SimpleCommand::program() {
 void SimpleCommand::redirectInputs() {
     if (!redirects.empty()) {
         for (IORedirect const &red : redirects) {
-            //TODO: &1 operators, e.g. `./outputs > out.txt 2>&1`;
+            //TODO: &1 operators, e.g. `./outputs > out.txt 2>&1`
             int flags;
             switch(red.getType()) {
                 case IORedirect::Type::APPEND: flags = O_CREAT|O_RDWR|O_APPEND;

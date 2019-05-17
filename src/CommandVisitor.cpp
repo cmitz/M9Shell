@@ -3,7 +3,7 @@
 #include "Pipeline.h"
 #include "SimpleCommand.h"
 
-#define PRINT_DEBUG_INFO 1   // Set to 1 to print debug lines when visiting command parts
+#define PRINT_DEBUG_INFO 0   // Set to 1 to print debug lines when visiting command parts
 #if PRINT_DEBUG_INFO
 	#define LOG(...) do { printf(__VA_ARGS__); } while(false)
 #else
