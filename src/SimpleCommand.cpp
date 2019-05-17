@@ -3,10 +3,6 @@
 #include <fcntl.h>
 #include "SimpleCommand.h"
 
-//    std::string              command;
-//    std::vector<std::string> arguments;
-//    std::vector<IORedirect>  redirects;
-
 void SimpleCommand::execute() {
     if (command == "exit") {
         exit(EXIT_SUCCESS);
@@ -67,6 +63,7 @@ void SimpleCommand::cd() {
 /**
  * Execute whatever command has been given as a program
  * Exits the spawned child process!
+ * E.g. echo "hoi" >> helloworld
  */
 void SimpleCommand::program() {
     // Convert arguments to char* so we can supply that to execvp
@@ -92,11 +89,21 @@ void SimpleCommand::program() {
 
             if (!redirects.empty()) {
                 for (IORedirect const &red : redirects) {
-                    if (red.getType() == IORedirect::Type::APPEND) {
-                        std::string const &out = red.getNewFile();
-                        int fd = open(out.c_str(), O_CREAT|O_APPEND, 0664);
-                        std::cout << "FD: " << fd << std::endl;
-                        dup2(fd, 1); // Replace stdout with fd; close original fd
+                    int fd;
+                    switch(red.getType()) {
+                        case IORedirect::Type::APPEND:
+                            fd = open(red.getNewFile().c_str(), O_CREAT|O_RDWR|O_APPEND, 0664);
+                            dup2(fd, red.getOldFileDescriptor());
+                            break;
+                        case IORedirect::Type::OUTPUT:
+                            fd = open(red.getNewFile().c_str(), O_CREAT|O_TRUNC|O_WRONLY, 0664);
+                            dup2(fd, red.getOldFileDescriptor());
+                            break;
+                        case IORedirect::Type::INPUT:
+                            fd = open(red.getNewFile().c_str(), O_CREAT|O_RDONLY, 0664);
+                            printf(" INPUT fd: %d; %s", fd, red.getNewFile().c_str());
+                            dup2(fd, red.getOldFileDescriptor());
+                            break;
                     }
                 }
             }
