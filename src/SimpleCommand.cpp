@@ -87,24 +87,7 @@ void SimpleCommand::program() {
             exit(-1);
         case 0: // This is the child process
 
-            if (!redirects.empty()) {
-                for (IORedirect const &red : redirects) {
-
-                    int flags;
-                    switch(red.getType()) {
-                        case IORedirect::Type::APPEND: flags = O_CREAT|O_RDWR|O_APPEND;
-                            break;
-                        case IORedirect::Type::OUTPUT: flags = O_CREAT|O_TRUNC|O_WRONLY;
-                            break;
-                        case IORedirect::Type::INPUT:
-                        default: flags = O_CREAT|O_RDONLY;
-                            break;
-                    }
-                    int fd = open(red.getNewFile().c_str(), flags, 0664);
-                    dup2(fd, red.getOldFileDescriptor());
-                }
-            }
-
+            redirectInputs();
             execvp(command.c_str(), argsc.data()); // Replace current process with command process
             exit(EXIT_SUCCESS);
 
@@ -113,4 +96,24 @@ void SimpleCommand::program() {
     }
 
     std::cout << "Program " << command << " exited with status code " << returnValue << "." << std::endl;
+}
+
+void SimpleCommand::redirectInputs() {
+    if (!redirects.empty()) {
+        for (IORedirect const &red : redirects) {
+            //TODO: &1 operators, e.g. `./outputs > out.txt 2>&1`;
+            int flags;
+            switch(red.getType()) {
+                case IORedirect::Type::APPEND: flags = O_CREAT|O_RDWR|O_APPEND;
+                    break;
+                case IORedirect::Type::OUTPUT: flags = O_CREAT|O_TRUNC|O_WRONLY;
+                    break;
+                case IORedirect::Type::INPUT:
+                default: flags = O_CREAT|O_RDONLY;
+                    break;
+            }
+            int fd = open(red.getNewFile().c_str(), flags, 0664);
+            dup2(fd, red.getOldFileDescriptor());
+        }
+    }
 }

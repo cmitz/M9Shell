@@ -24,6 +24,7 @@ class SimpleCommand {
 		std::string pwd();
 		void cd();
         void program();
+        void redirectInputs();
 
 	public:
 		SimpleCommand( std::string const &cmd )
