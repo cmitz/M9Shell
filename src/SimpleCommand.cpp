@@ -98,21 +98,26 @@ void SimpleCommand::program() {
 }
 
 void SimpleCommand::redirectInputs() {
-    if (!redirects.empty()) {
-        for (IORedirect const &red : redirects) {
-            //TODO: &1 operators, e.g. `./outputs > out.txt 2>&1`
+    for (IORedirect const &red : redirects) {
+        int fd = 0;
+        if(red.getNewFile().at(0) == '&') {
+            fd = std::stoi(red.getNewFile().substr(1,1));
+        } else {
             int flags;
-            switch(red.getType()) {
-                case IORedirect::Type::APPEND: flags = O_CREAT|O_RDWR|O_APPEND;
+            switch (red.getType()) {
+                case IORedirect::Type::APPEND:
+                    flags = O_CREAT | O_RDWR | O_APPEND;
                     break;
-                case IORedirect::Type::OUTPUT: flags = O_CREAT|O_TRUNC|O_WRONLY;
+                case IORedirect::Type::OUTPUT:
+                    flags = O_CREAT | O_TRUNC | O_WRONLY;
                     break;
                 case IORedirect::Type::INPUT:
-                default: flags = O_CREAT|O_RDONLY;
+                default:
+                    flags = O_CREAT | O_RDONLY;
                     break;
             }
-            int fd = open(red.getNewFile().c_str(), flags, 0664);
-            dup2(fd, red.getOldFileDescriptor());
+            fd = open(red.getNewFile().c_str(), flags, 0664);
         }
+        dup2(fd, red.getOldFileDescriptor());
     }
 }
