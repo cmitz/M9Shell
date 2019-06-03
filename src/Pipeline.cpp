@@ -16,7 +16,6 @@ Pipeline::~Pipeline() {
  * cmd0    cmd1   cmd2   cmd3   cmd4
  *    pipe0   pipe1  pipe2  pipe3
  *    [0,1]   [2,3]  [4,5]  [6,7]
- * https://stackoverflow.com/a/917700/1718346
  */
 void Pipeline::execute() {
     // Use symbolic constants instead of magic numbers for readability
@@ -74,7 +73,10 @@ void Pipeline::execute() {
                         old_pipefd[PIPE_READ] = new_pipefd[PIPE_READ];
                         old_pipefd[PIPE_WRITE] = new_pipefd[PIPE_WRITE];
                     }
+
+                    // Wait for child process!
                     waitpid(cid, nullptr, 0);
+
                 // End default
             } // End switch
             commandCounter++;
