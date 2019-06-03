@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/casper/src/saxion/2.3CompOSs/M9Shell/utils/slow.cpp
+cstdlib
+-
+iostream
+-
+unistd.h
+-
+

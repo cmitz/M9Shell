@@ -1,0 +1,7 @@
+/Users/casper/src/saxion/2.3CompOSs/M9Shell/build/CMakeFiles/edit_cache.dir
+/Users/casper/src/saxion/2.3CompOSs/M9Shell/build/CMakeFiles/rebuild_cache.dir
+/Users/casper/src/saxion/2.3CompOSs/M9Shell/build/CMakeFiles/outputs.dir
+/Users/casper/src/saxion/2.3CompOSs/M9Shell/build/CMakeFiles/slow.dir
+/Users/casper/src/saxion/2.3CompOSs/M9Shell/build/CMakeFiles/printArgs.dir
+/Users/casper/src/saxion/2.3CompOSs/M9Shell/build/CMakeFiles/errorReturn.dir
+/Users/casper/src/saxion/2.3CompOSs/M9Shell/build/CMakeFiles/shell.dir
